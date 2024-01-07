@@ -1,0 +1,59 @@
+import os
+import shutil
+TK_SILENCE_DEPRECATION=1
+import tkinter as tk
+from tkinter import ttk
+from tkinter import messagebox
+
+
+def organize_files():
+    path = entry_path.get()
+    if not os.path.isdir(path):
+        messagebox.showerror("Error", "Invalid path")
+        return
+
+    files = os.listdir(path)
+
+    for file in files:
+        filename, extension = os.path.splitext(file)
+        extension = extension[1:]
+
+        if os.path.exists(os.path.join(path, extension)):
+            shutil.move(os.path.join(path, file), os.path.join(path, extension, file))
+        else:
+            os.makedirs(os.path.join(path, extension))
+            shutil.move(os.path.join(path, file), os.path.join(path, extension, file))
+
+    messagebox.showinfo("Success", "Files organized!")
+
+# Create the main window
+root = tk.Tk()
+root.title("Resizable File Organizer")
+root.configure(bg="#7D110C")
+
+# Create and place widgets
+style = ttk.Style()
+style.configure("TButton", font=("Helvetica", 12), background="#BF2618", foreground="white")
+style.configure("TLabel", font=("Helvetica", 12), background="#7D110C", foreground="white")
+
+frame = ttk.Frame(root, padding=20)
+frame.grid(row=0, column=0, sticky="nsew")
+
+label_path = ttk.Label(frame, text="Enter Path:")
+label_path.grid(row=0, column=0, sticky="w")
+
+entry_path = ttk.Entry(frame, width=40, font=("Helvetica", 12))
+entry_path.grid(row=0, column=1, sticky="w")
+
+organize_button = ttk.Button(frame, text="Organize Files", command=organize_files)
+organize_button.grid(row=1, column=0, columnspan=2, pady=10)
+
+quit_button = ttk.Button(frame, text="Quit", command=root.quit)
+quit_button.grid(row=2, column=0, columnspan=2)
+
+# Allow rows and columns to expand with window resizing
+root.grid_rowconfigure(0, weight=1)
+root.grid_columnconfigure(0, weight=1)
+
+# Start the Tkinter event loop
+root.mainloop()
